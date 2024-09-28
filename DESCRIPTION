@@ -1,10 +1,10 @@
 Package: staccuracy
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Standardized Accuracy and Other Model Performance Metrics
+Version: 0.1.0
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    person("Chitu", "Okoli", , "Chitu.Okoli@skema.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-5574-7572"))
+Description: This package presents functions for calculating standardized accuracy (staccuracy) based on provided performance metrics. It also provides functions from some classic performance metrics that are highly recommended (such as MAE, RMSE, and AUCROC) as well as their windsorized versions when applicable.
 License: MIT + file LICENSE
 Suggests: 
     testthat (>= 3.0.0)
@@ -12,3 +12,10 @@ Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Imports: 
+    cli,
+    dplyr,
+    purrr,
+    rlang,
+    stringr,
+    utils
