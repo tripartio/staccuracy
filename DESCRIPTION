@@ -19,3 +19,5 @@ Imports:
     rlang,
     stringr,
     utils
+URL: https://github.com/tripartio/staccuracy
+BugReports: https://github.com/tripartio/staccuracy/issues
