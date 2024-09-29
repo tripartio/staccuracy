@@ -6,7 +6,15 @@
 \alias{staccuracy-package}
 \title{Standardized Accuracy and Other Model Performance Metrics}
 \description{
-This package presents functions for calculating standardized accuracy (staccuracy) based on provided performance metrics. It also provides functions from some classic performance metrics that are highly recommended (such as MAE, RMSE, and AUCROC) as well as their windsorized versions when applicable.
+This package presents functions for calculating standardized accuracy (staccuracy) based on provided performance metrics. It also provides functions from some classic performance metrics that are highly recommended (such as MAE, RMSE, and AUCROC) as well as their winsorized versions when applicable.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/tripartio/staccuracy}
+  \item Report bugs at \url{https://github.com/tripartio/staccuracy/issues}
+}
+
 }
 \author{
 Chitu Okoli \email{Chitu.Okoli@skema.edu}

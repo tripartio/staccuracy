@@ -2,18 +2,78 @@
 % Please edit documentation in R/staccuracy.R
 \name{standardized_accuracy}
 \alias{standardized_accuracy}
-\title{Create standardized accuracy (staccuracy) functions.}
+\alias{sa_mae_mad}
+\alias{sa_wmae_mad}
+\alias{sa_rmse_sd}
+\alias{sa_wrmse_sd}
+\title{Standardized accuracy (staccuracy) functions.}
 \usage{
 standardized_accuracy(error_fun, ref_fun)
+
+sa_mae_mad(actual, pred, na.rm = FALSE)
+
+sa_wmae_mad(actual, pred, na.rm = FALSE)
+
+sa_rmse_sd(actual, pred, na.rm = FALSE)
+
+sa_wrmse_sd(actual, pred, na.rm = FALSE)
 }
 \arguments{
-\item{error_fun}{function. The unquoted function name of the function that calculates error (or accuracy) measure. This function must be of the signature \code{error_fun(actual, pred, na.rm = FALSE)} where \code{actual} and \code{pred} are required numeric vectors of the true (actual) labels and the predicted estimates, respectively; \code{na.rm} is an optional scalar logical that indicates if NA values should be removed (\code{TRUE}) or not (\code{FALSE}, default).}
+\item{error_fun}{function. The unquoted name of the function that calculates the error (or accuracy) measure. This function must be of the signature \verb{function(actual, pred, na.rm = FALSE)}.}
 
-\item{ref_fun}{function. The unquoted function name of the function that calculates the reference error, accuracy, or deviation measure. This function must be of the signature \code{ref_fun(actual, na.rm = FALSE)} where \code{actual} and \code{na.rm} have the same meanings as described for \code{error_fun}.}
+\item{ref_fun}{function. The unquoted name of the function that calculates the reference error, accuracy, or deviation measure. This function must be of the signature \code{ref_fun(actual, na.rm = FALSE)}.}
+
+\item{actual}{numeric. The true (actual) labels.}
+
+\item{pred}{numeric. The predicted estimates. Must be the same length as \code{actual}.}
+
+\item{na.rm}{logical(1). Whether NA values should be removed (\code{TRUE}) or not (\code{FALSE}, default).}
 }
 \value{
-Function with signature \verb{function(actual, pred, na.rm = FALSE)} whose arguments have the same meanings as  described for the \code{error_fun} input argument.
+\code{standardized_accuracy()} returns a function with signature \verb{function(actual, pred, na.rm = FALSE)} that receives an \code{actual} and a \code{pred} vector as inputs and returns the staccuracy of the originally input error function based on the input reference function.
+
+The convenience \verb{sa_*()} functions return the staccuracy measures specified above.
 }
 \description{
-Create standardized accuracy (staccuracy) functions.
+Standardized accuracy (staccuracy) represents error or accuracy measures on a scale where 1 or 100\% means perfect prediction and 0.5 or 50\% is a reference comparison of some specified standard performance. Higher than 0.5 is better than the reference and below 0.5 is worse. 0 might or might not have a special meaning; sometimes negative scores are possible, but these often indicate modelling errors.
+
+The core function is \code{standardized_accuracy()}, which receives as input a generic error function and a reference function against which to compare the error function performance. In addition, the following recommended staccuracy functions are provided:
+\itemize{
+\item \code{sa_mae_mad}: standardized accuracy of the mean absolute error (MAE) based on the mean absolute deviation (MAD)
+\item \code{sa_rmse_sd}: standardized accuracy of the root mean squared error (RMSE) based on the standard deviation (SD)
+\item \code{sa_wmae_mad}: standardized accuracy of the winsorized mean absolute error (MAE) based on the mean absolute deviation (MAD)
+\item \code{sa_wrmse_sd}: standardized accuracy of the winsorized root mean squared error (RMSE) based on the standard deviation (SD)
+}
+}
+\details{
+The core function \code{standardized_accuracy()} receives as input a generic error function and a reference function against which to compare the error function's performance. These input functions must have the following signatures (see the argument specifications for details of the arguments):
+\itemize{
+\item \code{error_fun}: \verb{function(actual, pred, na.rm = na.rm)}; the output must be a scalar numeric (that is, a single number).
+\item \code{error_fun}: \verb{function(actual, pred, na.rm = na.rm)}; the output must be a scalar numeric (that is, a single number).
+}
+}
+\examples{
+# Here's some data
+actual_1 <- c(2.3, 4.5, 1.8, 7.6, 3.2)
+
+# Here are some predictions of that data
+predicted_1 <- c(2.5, 4.2, 1.9, 7.4, 3.0)
+
+# MAE measures the average error in the predictions
+mae(actual_1, predicted_1)
+
+# But how good is that?
+# MAD gives the natural variation in the actual data; this is a point of comparison.
+mad(actual_1)
+
+# So, our predictions are better (lower) than the MAD, but how good, really?
+# Create a standardized accuracy function to give us an easily interpretable metric:
+my_mae_vs_mad_sa <- standardized_accuracy(mae, mad)
+
+# Now use it
+my_mae_vs_mad_sa(actual_1, predicted_1)
+
+# That's 94.2\% standardized accuracy compared to the MAD. Pretty good!
+
+
 }

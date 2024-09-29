@@ -1,30 +1,125 @@
-# We added three simple functions to generate common model evaluation measures: `rmse` for the root mean squared error, `mae` for the mean absolute error, and `mad` for the mean absolute deviation.
+# Regression error and deviation measures -------------------
+
+#' Regression error and deviation measures
+#'
+#'
+#' @rdname reg-error
+#'
+#' @description
+#' These are standard error and deviation measures for numeric data. "Deviation" means the natural variation of the values of a numeric vector around its central tendency (usually the mean or median). "Error" means the average discrepancy between the actual values of a numeric vector and its predicted values.
+#'
+#' @details
+#' **Mean absolute deviation (MAD)**
+#'
+#' `mad()` returns the mean absolute deviation (MAD) of values relative to their mean. This is useful as a default benchmark for the mean absolute error (MAE), as the standard deviation (SD) is a default benchmark for the root mean square error (RMSE).
+#'
+#' **NOTE:** This function name overrides `stats::mad()` (median absolute deviation relative to their median). To maintain the functionality of `stats::mad()`, specify the `version` argument.
+#'
+#'
+#' @param actual numeric vector. Actual (true) values of target outcome data.
+#' @param pred numeric vector. Predictions corresponding to each respective element in `actual`.
+#' @param na.rm logical(1). `TRUE` if missing values should be removed; `FALSE` if they should be retained. If `TRUE`, then if any element of either `actual` or `pred` is missing, its paired element will be also removed.
+#'
+#' @returns
+#' In all cases, if any value in `actual` or `pred` is `NA` and `na.rm = FALSE`, then the function returns `NA`.
+#'
+#'
+#' @examples
+#' a <- c(3, 5, 2, 7, 9, 4, 6, 8, 1, 10)
+#' p <- c(2.5, 5.5, 2, 6.5, 9.5, 3.5, 6, 7.5, 1.5, 9.5)
+
+
+#' @export
+# @rdname reg-error
+#'
+#' @returns `mae()` returns the mean absolute error (MAE) of predicted values `pred` compared to the `actual` values.
+#'
+#' @examples
+#' mae(a, p)
+#'
+mae <- function(actual, pred, na.rm = FALSE) {
+  error_vector(actual, pred, na.rm) |>
+    abs() |>
+    mean()
+}
+
+
+#' @export
+#' @rdname reg-error
+#'
+#' @returns `rmse()` returns the root mean squared error (RMSE) of predicted values `pred` compared to the `actual` values.
+#'
+#' @examples
+#' rmse(a, p)
+#'
+rmse <- function(actual, pred, na.rm = FALSE) {
+  error_vector(actual, pred, na.rm) |>
+    (`^`)(2) |>
+    mean() |>
+    sqrt()
+}
 
 
 
+#' @export
+#' @rdname reg-error
+#'
+#' @param x numeric vector. Values for which to calculate the MAD.
+#' @param version character(1). By default (`version = 'mean'`), `mad()` returns the mean absolute deviation (MAD) of values relative to their mean. If `version = 'median'`, it calls the `stats::mad()` function instead, the median absolute deviation relative to their median (MedAD, sometimes also called MAD). Any other value gives an error. See details.
+#' @param ... Arguments to pass to `stats::mad()` if `version = 'median'`. See the `version` argument for details.
+#'
+#' @returns `mad()` returns either the mean absolute deviation (MAD) of values relative to their mean (default) or the median absolute deviation relative to their median. See details.
+#'
+#' @examples
+#' mad(a)
+#'
+mad <- function(x, na.rm = FALSE, version = 'mean', ...) {
+  validate(
+    version %in% c('mean', 'median'),
+    msg = c(
+      "{.var version} must be either {.val mean} or {.val median}",
+      "x" = 'It is instead {version}.'
+    )
+  )
+
+  if (version == 'mean') {
+    return(
+      # MAD is MAE of values around their mean
+      mae(
+        actual = rep(mean(x, na.rm = na.rm), length(x)),
+        pred = x,
+        na.rm = na.rm
+      )
+    )
+  }
+
+  else if (version == 'median') {
+    return(stats::mad(x = x, na.rm = na.rm, ...))
+  }
+}
+
+
+
+
+#' @noRd
+#' @keywords internal
 # Calculate the error (or deviation) between two numeric vectors
 #
-# Not exported. Returns the error (or deviation) between two numeric vectors. This is a utility
-# function for other functions that need to calculate such error or deviation
-# because this function validates the inputs and handles the `na.rm` instruction.
-#
-# @param actual numeric vector. Actual (true) values from a dataset.
-# @param pred numeric vector. Predictions corresponding to each respective
-# element in `actual`.
-# @param na.rm single logical. TRUE if missing values should be removed; FALSE
-# if they should be retained. If TRUE, then if any element of either actual or
-# pred is missing, its paired element will be also removed.
-#
-# @returns Numeric vector of the same length as `actual` and `pred`. But if
-# `na.rm = TRUE`, the vector will be shortened to omit any values where either
-# actual or pred is `NA`.
-#
+# Not exported. Returns the error (or deviation) between two numeric vectors. This is a utility function for other functions that need to calculate such error or deviation because this function validates the inputs and handles the `na.rm` instruction.
+#'
+#' @returns Numeric vector of the differences between `actual` and `pred`; length is the same as `actual` and `pred`. But if `na.rm = TRUE`, the vector will be shortened to omit any values where either actual or pred is `NA`.
+#'
+#' @examples
+#' a <- c(3, 5, 2, 7, 9, 4, 6, 8, 1, 10)
+#' p <- c(2.5, 5.5, 2, 6.5, 9.5, 3.5, 6, 7.5, 1.5, 9.5)
+#' error_vector(a, p)
+#'
 error_vector <- function(actual, pred, na.rm = FALSE) {
   # Validate inputs
   validate(is.numeric(actual))
   validate(is.numeric(pred))
   validate(length(actual) == length(pred))
-  validate(is_scalar_logical(na.rm) && !is.na(na.rm))
+  validate(rlang::is_scalar_logical(na.rm) && !is.na(na.rm))
 
   error <- actual - pred
 
@@ -37,60 +132,29 @@ error_vector <- function(actual, pred, na.rm = FALSE) {
 
 
 
-#' Mean absolute error (MAE)
-#'
-#' Returns the mean absolute error (MAE) of predicted values relative to the actual values.
-#'
-#' @export
-#' @rdname reg-error
-#'
-#' @param actual numeric vector. Actual (true) values from a dataset.
-#' @param pred numeric vector. Predictions corresponding to each respective
-#' element in `actual`.
-#' @param na.rm single logical. `TRUE` if missing values should be removed; `FALSE` if they should be retained. If `TRUE`, then if any element of either `actual`  or `pred` is missing, its paired element will be also removed.
-#'
-#' @returns MAE of `actual` and `pred`. If any value in `actual` or `pred` is
-#' `NA` and `na.rm = FALSE`, then returns `NA`.
-#'
-mae <- function(actual, pred, na.rm = FALSE) {
-  error_vector(actual, pred, na.rm) |>
-    abs() |>
-    mean()
-}
+# Winsorization measures ------------------
 
-
-#' Root mean squared error
+#'  Winsorize a numeric vector
 #'
-#' Returns the root mean squared error (RMSE) of predicted values relative to the actual values.
+#' @description
+#' Winsorization means truncating the extremes of a numeric range by replacing extreme values with a predetermined minimum and maximum. `winsorize()` returns the input vector values with values less than or greater than the provided minimum or maximum replaced by the provided minimum or maximum, respectively.
 #'
-#' @export
-#' @rdname reg-error
-#'
-#' @param actual See documentation for [mae()]
-#' @param pred See documentation for [mae()]
-#' @param na.rm See documentation for [mae()]
-#'
-#' @returns RMSE of `actual` and `pred`. If any value in `actual` or `pred` is `NA` and `na.rm = FALSE`, returns `NA`.
-#'
-rmse <- function(actual, pred, na.rm = FALSE) {
-  error_vector(actual, pred, na.rm) |>
-    (`^`)(2) |>
-    mean() |>
-    sqrt()
-}
-
-
-#' Winsorize a numeric vector.
-#'
-#' Returns the input vector values with values less than or greater than the provided minimum or maximum replaced by the provided minimum or maximum, respectively.
+#' `win_mae()` and `win_rmse()` return MAE and RMSE respectively with winsorized predictions. The fundamental idea underlying the winsorization of predictions is that if the actual data has well-defined bounds, then models should not be penalized for being overzealous in predicting beyond the extremes of the data. Models that are overzealous in the boundaries might sometimes be superior within normal ranges; the extremes can be easily corrected by winsorization.
 #'
 #' @export
 #' @rdname win-error
 #'
 #' @param x numeric vector.
-#' @param win_range numeric(2). A pair of single numeric values: the minimum and maximum allowable values for x, respectively.
+#' @param win_range numeric(2). The minimum and maximum allowable values for the `pred` predictions or for `x`. For functions with `pred`, `win_range` defaults to the minimum and maximum values of the provided `actual` values. For functions with `x`, there is no default.
 #'
-#' @returns Winsorized MAE of `actual` and `pred`. See mae() for details.
+#' @returns `winsorize()` returns a winsorized vector.
+#'
+#' @examples
+#' a <- c(3, 5, 2, 7, 9, 4, 6, 8, 2, 10)
+#' p <- c(2.5, 5.5, 1.5, 6.5, 10.5, 3.5, 6, 7.5, 0.5, 11.5)
+#'
+#' a  # the original data
+#' winsorize(a, c(2, 8))  # a winsorized on defined boundaries
 #'
 winsorize <- function(
     x,
@@ -117,20 +181,29 @@ winsorize <- function(
 }
 
 
-#' Winsorized mean absolute error (WinMAE)
-#'
-#' Returns the mean absolute error (MAE) with predictions winsorized within a specified range.
-#'
 #' @export
 #' @rdname win-error
 #'
-#' @param actual numeric vector. Actual (true) values from a dataset.
-#' @param pred numeric vector. Predictions corresponding to each respective
-#' element in `actual`.
-#' @param win_range numeric(2). The minimum and maximum allowable values for the `pred` predictions. Defaults to the minimum and maximum values of the provided `actual` values.
-#' @param na.rm single logical. `TRUE` if missing values should be removed; `FALSE` if they should be retained. If `TRUE`, then if any element of either `actual`  or `pred` is missing, its paired element will be also removed.
+#' @param actual numeric vector. Actual (true) values of target outcome data.
+#' @param pred numeric vector. Predictions corresponding to each respective element in `actual`.
+#' @param na.rm logical(1). `TRUE` if missing values should be removed; `FALSE` if they should be retained. If `TRUE`, then if any element of either `actual` or `pred` is missing, its paired element will be also removed.
 #'
-#' @returns Winsorized MAE of `actual` and `pred`. See mae() for details.
+#' @returns `win_mae()` returns the mean absolute error (MAE) of winsorized predicted values `pred` compared to the `actual` values. See `mae()` for details.
+#'
+#' @examples
+#' # range of the original data
+#' a
+#' range(a)
+#'
+#' # some overzealous predictions
+#' p
+#' range(p)
+#'
+#' # MAE penalizes overzealous predictions
+#' mae(a, p)
+#'
+#' # Winsorized MAE forgives overzealous predictions
+#' win_mae(a, p)
 #'
 win_mae <- function(
     actual,
@@ -148,6 +221,15 @@ win_mae <- function(
 #' @export
 #' @rdname win-error
 #'
+#' @returns `win_rmse()` returns the root mean squared error (RMSE) of winsorized predicted values `pred` compared to the `actual` values. See `rmse()` for details.
+#'
+#' @examples
+#' # RMSE penalizes overzealous predictions
+#' rmse(a, p)
+#'
+#' # Winsorized RMSE forgives overzealous predictions
+#' win_rmse(a, p)
+#'
 win_rmse <- function(
     actual,
     pred,
@@ -161,44 +243,3 @@ win_rmse <- function(
   )
 }
 
-
-#' Mean absolute deviation
-#'
-#' Returns the mean absolute deviation (MAD) of values relative to their mean. This is useful as a default benchmark for the mean absolute error (MAE), as the standard deviation (SD) is a default benchmark for the root mean square error (RMSE).
-#'
-#' NOTE: This function name overrides `stats::mad()` (median absolute deviation relative to their median). To maintain the functionality of `stats::mad()`, specify the `version` argument.
-#'
-#' @export
-#' @rdname reg-error
-#'
-#' @param x numeric vector. Values for which to calculate the mean absolute deviation.
-#' @param na.rm logical(1). TRUE if missing values should be removed; FALSE if they should be retained.
-#' @param version character(1). By default (`version = 'mean'`), `mad()` returns the mean absolute deviation (MAD) of values relative to their mean. If `version = 'median'`, it calls the `stats::mad()` function instead, the median absolute deviation relative to their median. Any other value gives an error.
-#' @param ... Arguments to pass to `stats::mad()` if `version = 'median'`. See the `version` argument for details.
-#'
-#' @returns MAD of the `x` values. If any value of `x` is `NA` and `na.rm = FALSE`, returns `NA`.
-#'
-mad <- function(x, na.rm = FALSE, version = 'mean', ...) {
-  validate(
-    version %in% c('mean', 'median'),
-    msg = c(
-      "{.var version} must be either {.val mean} or {.val median}",
-      "x" = 'It is instead {version}.'
-    )
-  )
-
-  if (version == 'mean') {
-    return(
-      # MAD is MAE of values around their mean
-      mae(
-        actual = rep(mean(x, na.rm = na.rm), length(x)),
-        pred = x,
-        na.rm = na.rm
-      )
-    )
-  }
-
-  else if (version == 'median') {
-    return(stats::mad(x = x, na.rm = na.rm, ...))
-  }
-}

@@ -3,7 +3,7 @@
 #' Returns the area under the ROC curve based on comparing the predicted scores to the actual binary values. Tied predictions are handled by calculating the optimistic AUC (positive cases sorted first, resulting in higher AUC) and the pessimistic AUC (positive cases sorted last, resulting in lower AUC) and then returning the average of the two. For the ROC, a "tie" means at least one pair of `pred` predictions whose value is identical yet their corresponding values of `actual` are different. (If the value of `actual` are the same for identical predictions, then these are unproblematic and are not considered "ties".)
 #'
 #' @export
-#' @rdname reg-error
+#' @rdname class-error
 #'
 #' @param actual any atomic vector. Actual label values from a dataset. They must be binary; that is, there must be exactly two distinct values (other than missing values, which are allowed). The "true" or "positive" class is determined by coercing `actual` to logical `TRUE` and `FALSE` following the rules of [as.logical()]. If this is not the intended meaning of "positive", then specify which of the two values should be considered `TRUE` with the argument `binary_true_value`.
 #' @param pred numeric vector. Predictions corresponding to each respective element in `actual`. Any numeric value (not only probabilities) are permissible.
@@ -19,6 +19,19 @@
 #' * `auc_pess`: area under the ROC curve for pessimistic ROC.
 #' * `auc`: mean of `auc_opt` and `auc_pess`. If there are no tied predictions, then `auc_opt`, `auc_pess`, and `auc` are identical.
 #' * `ties`: `TRUE` if there are two or more tied predictions; `FALSE` if there are no ties.
+#'
+#' @examples
+#' set.seed(0)
+#' # Generate some simulated "actual" data
+#' a <- sample(c(TRUE, FALSE), 50, replace = TRUE)
+#'
+#' # Generate some simulated predictions
+#' p <- runif(50) |> round(2)
+#' p[c(7, 8, 22, 35, 40, 41)] <- 0.5
+#'
+#' # Calculate AUCROC with its components
+#' ar <- aucroc(a, p)
+#' ar$auc
 #'
 aucroc <- function(
     actual,
@@ -36,7 +49,7 @@ aucroc <- function(
   validate(is.numeric(pred))
 
   validate(length(actual) == length(pred))
-  validate(is_scalar_logical(na.rm) && !is.na(na.rm))
+  validate(rlang::is_scalar_logical(na.rm) && !is.na(na.rm))
 
   validate(is_scalar_natural(sample_size))
   validate(is.numeric(seed))

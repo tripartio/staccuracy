@@ -4,7 +4,7 @@
 \alias{winsorize}
 \alias{win_mae}
 \alias{win_rmse}
-\title{Winsorize a numeric vector.}
+\title{Winsorize a numeric vector}
 \usage{
 winsorize(x, win_range)
 
@@ -15,22 +15,51 @@ win_rmse(actual, pred, win_range = range(actual), na.rm = FALSE)
 \arguments{
 \item{x}{numeric vector.}
 
-\item{win_range}{numeric(2). The minimum and maximum allowable values for the \code{pred} predictions. Defaults to the minimum and maximum values of the provided \code{actual} values.}
+\item{win_range}{numeric(2). The minimum and maximum allowable values for the \code{pred} predictions or for \code{x}. For functions with \code{pred}, \code{win_range} defaults to the minimum and maximum values of the provided \code{actual} values. For functions with \code{x}, there is no default.}
 
-\item{actual}{numeric vector. Actual (true) values from a dataset.}
+\item{actual}{numeric vector. Actual (true) values of target outcome data.}
 
-\item{pred}{numeric vector. Predictions corresponding to each respective
-element in \code{actual}.}
+\item{pred}{numeric vector. Predictions corresponding to each respective element in \code{actual}.}
 
-\item{na.rm}{single logical. \code{TRUE} if missing values should be removed; \code{FALSE} if they should be retained. If \code{TRUE}, then if any element of either \code{actual}  or \code{pred} is missing, its paired element will be also removed.}
+\item{na.rm}{logical(1). \code{TRUE} if missing values should be removed; \code{FALSE} if they should be retained. If \code{TRUE}, then if any element of either \code{actual} or \code{pred} is missing, its paired element will be also removed.}
 }
 \value{
-Winsorized MAE of \code{actual} and \code{pred}. See mae() for details.
+\code{winsorize()} returns a winsorized vector.
 
-Winsorized MAE of \code{actual} and \code{pred}. See mae() for details.
+\code{win_mae()} returns the mean absolute error (MAE) of winsorized predicted values \code{pred} compared to the \code{actual} values. See \code{mae()} for details.
+
+\code{win_rmse()} returns the root mean squared error (RMSE) of winsorized predicted values \code{pred} compared to the \code{actual} values. See \code{rmse()} for details.
 }
 \description{
-Returns the input vector values with values less than or greater than the provided minimum or maximum replaced by the provided minimum or maximum, respectively.
+Winsorization means truncating the extremes of a numeric range by replacing extreme values with a predetermined minimum and maximum. \code{winsorize()} returns the input vector values with values less than or greater than the provided minimum or maximum replaced by the provided minimum or maximum, respectively.
 
-Returns the mean absolute error (MAE) with predictions winsorized within a specified range.
+\code{win_mae()} and \code{win_rmse()} return MAE and RMSE respectively with winsorized predictions. The fundamental idea underlying the winsorization of predictions is that if the actual data has well-defined bounds, then models should not be penalized for being overzealous in predicting beyond the extremes of the data. Models that are overzealous in the boundaries might sometimes be superior within normal ranges; the extremes can be easily corrected by winsorization.
+}
+\examples{
+a <- c(3, 5, 2, 7, 9, 4, 6, 8, 2, 10)
+p <- c(2.5, 5.5, 1.5, 6.5, 10.5, 3.5, 6, 7.5, 0.5, 11.5)
+
+a  # the original data
+winsorize(a, c(2, 8))  # a winsorized on defined boundaries
+
+# range of the original data
+a
+range(a)
+
+# some overzealous predictions
+p
+range(p)
+
+# MAE penalizes overzealous predictions
+mae(a, p)
+
+# Winsorized MAE forgives overzealous predictions
+win_mae(a, p)
+
+# RMSE penalizes overzealous predictions
+rmse(a, p)
+
+# Winsorized RMSE forgives overzealous predictions
+win_rmse(a, p)
+
 }
