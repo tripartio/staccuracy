@@ -19,5 +19,5 @@ Imports:
     purrr,
     rlang,
     utils
-URL: https://github.com/tripartio/staccuracy
+URL: https://github.com/tripartio/staccuracy, https://tripartio.github.io/staccuracy/
 BugReports: https://github.com/tripartio/staccuracy/issues

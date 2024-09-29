@@ -12,6 +12,7 @@ This package presents functions for calculating standardized accuracy (staccurac
 Useful links:
 \itemize{
   \item \url{https://github.com/tripartio/staccuracy}
+  \item \url{https://tripartio.github.io/staccuracy/}
   \item Report bugs at \url{https://github.com/tripartio/staccuracy/issues}
 }
 
