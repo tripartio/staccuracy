@@ -6,7 +6,7 @@
 \alias{staccuracy-package}
 \title{Standardized Accuracy and Other Model Performance Metrics}
 \description{
-This package presents functions for calculating standardized accuracy (staccuracy) based on provided performance metrics. It also provides functions from some classic performance metrics that are highly recommended (such as MAE, RMSE, and AUCROC) as well as their winsorized versions when applicable.
+Standardized accuracy (staccuracy) is a framework for expressing accuracy scores such that 50\% represents a reference level of performance and 100\% is perfect prediction. The 'staccuracy' package provides tools for creating staccuracy functions as well as some recommended staccuracy measures. It also provides functions for some classic performance metrics such as mean absolute error (MAE), root mean squared error (RMSE), and area under the receiver operating characteristic curve (AUCROC), as well as their winsorized versions when applicable.
 }
 \seealso{
 Useful links:
