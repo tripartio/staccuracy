@@ -60,7 +60,7 @@ mad(actual_1)
 
 # So, our predictions are better (lower) than the MAD, but how good, really?
 # Create a standardized accuracy function to give us an easily interpretable metric:
-my_mae_vs_mad_sa <- standardized_accuracy(mae, mad)
+my_mae_vs_mad_sa <- staccuracy(mae, mad)
 
 # Now use it
 my_mae_vs_mad_sa(actual_1, predicted_1)

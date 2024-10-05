@@ -2,7 +2,6 @@
 % Please edit documentation in R/staccuracy-package.R
 \docType{package}
 \name{staccuracy-package}
-\alias{staccuracy}
 \alias{staccuracy-package}
 \title{Standardized Accuracy and Other Model Performance Metrics}
 \description{
