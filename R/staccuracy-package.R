@@ -12,6 +12,7 @@
 #' @import dplyr
 #' @importFrom cli cli_abort
 #' @importFrom cli cli_alert_danger
+#' @importFrom purrr imap
 #' @importFrom purrr map
 #' @importFrom purrr set_names
 #' @importFrom rlang .data

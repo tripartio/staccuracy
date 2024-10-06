@@ -1,5 +1,7 @@
-# validation.R
-# Data validation code shared across some functions.
+# utils.R
+
+
+# Data validation --------------------
 
 
 # Custom version of asserthat::assert_that. This way, I skip that dependency
@@ -67,4 +69,42 @@ is_scalar_natural <- function(x) {
 # TRUE if x is a scalar whole number (non-negative integer, zero included)
 is_scalar_whole <- function(x) {
   rlang::is_scalar_integer(x) || x >= 0
+}
+
+
+# Miscellaneous -----------------
+
+#' Determine the datatype of a vector
+#'
+#' @param var vector whose datatype is to be determined
+#'
+#' @returns Returns generic datatypes of R basic vectors according to the following mapping:
+#'  * `logical` returns 'binary'
+#'  * `numeric` values (e.g., `integer` and `double`) return 'numeric'
+#'  * However, if the only values of numeric are 0 and 1, then it returns 'binary'
+#'  * unordered `factor` returns 'categorical'
+#'  * `ordered` `factor` returns 'ordinal'
+#' @export
+#'
+#' @examples
+#' var_type(c(1, 2, 3))
+var_type <- function(var) {
+
+  # If var has more than one class, use only the first (predominant) one.
+  # This is particularly needed for ordered factors, whose class is
+  # c('ordered', 'factor')
+  class_var <- class(var)[1]
+
+  return(case_when(
+    class_var == 'logical' ~ 'binary',
+    # var consisting only of one of any two values (excluding NA) is considered binary.
+    # This test must be placed before all the others to ensure that it takes precedence, no matter what the underlying datatype might be.
+    (var |> na.omit() |> unique() |> length()) == 2 ~ 'binary',
+    is.numeric(var) ~ 'numeric',
+    class_var %in% c('factor', 'character') ~ 'categorical',
+    class_var == 'ordered' ~ 'ordinal',
+    # Consider dates to be numeric; they seem to work OK like that
+    class_var %in% c('POSIXct', 'POSIXt') ~ 'numeric',
+  ))
+
 }

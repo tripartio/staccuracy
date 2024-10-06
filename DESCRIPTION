@@ -18,6 +18,7 @@ Imports:
     dplyr,
     purrr,
     rlang,
+    tidyr,
     utils
 URL: https://github.com/tripartio/staccuracy, https://tripartio.github.io/staccuracy/
 BugReports: https://github.com/tripartio/staccuracy/issues

@@ -1,4 +1,4 @@
-# test-staccuracy.R
+# test-regression.R
 
 
 test_that("rmse function works correctly", {
