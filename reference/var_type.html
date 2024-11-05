@@ -29,7 +29,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Determine the datatype of a vector</h1>
-      <small class="dont-index">Source: <a href="https://github.com/tripartio/staccuracy/blob/main/R/utils.R" class="external-link"><code>R/utils.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/tripartio/staccuracy/blob/main/R/unpackaged_utils.R" class="external-link"><code>R/unpackaged_utils.R</code></a></small>
       <div class="d-none name"><code>var_type.Rd</code></div>
     </div>
 
@@ -47,7 +47,8 @@
 
 
 <dl><dt id="arg-var">var<a class="anchor" aria-label="anchor" href="#arg-var"></a></dt>
-<dd><p>vector whose datatype is to be determined</p></dd>
+<dd><p>vector whose datatype is to be determined</p>
+<p>Not exported. See @returns for details of what it does.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -59,12 +60,6 @@
 <li><p><code>ordered</code> <code>factor</code> returns 'ordinal'</p></li>
 </ul></div>
 
-    <div class="section level2">
-    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">var_type</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "numeric"</span>
-</code></pre></div>
-    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
