@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">staccuracy</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.20241006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,14 +51,14 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>Standardized accuracy (staccuracy) is a framework for expressing accuracy scores such that 50% represents a reference level of performance and 100% is perfect prediction. The <code>staccuracy</code> package provides tools for creating staccuracy functions as well as some recommended staccuracy measures. It also provides functions for some classic performance metrics such as mean absolute error (MAE), root mean squared error (RMSE), and area under the receiver operating characteristic curve (AUCROC), as well as their winsorized versions when applicable.</p>
+<p>Standardized accuracy (staccuracy) is framework for expressing accuracy scores such that 50% represents a reference level of performance and 100% is a perfect prediction. The ‘staccuracy’ package provides tools for creating staccuracy functions as well as some recommended staccuracy measures. It also provides functions for some classic performance metrics such as mean absolute error (MAE), root mean squared error (RMSE), and area under the receiver operating characteristic curve (AUCROC), as well as their winsorized versions when applicable.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>You can install the development version of staccuracy like so:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"tripartio/staccuracy"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"tripartio/staccuracy"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
@@ -78,20 +78,18 @@
 <span><span class="co"># Here are some predictions of that data</span></span>
 <span><span class="va">predicted_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">4.2</span>, <span class="fl">1.9</span>, <span class="fl">7.4</span>, <span class="fl">3.0</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># MAE measures the average error in the predictions</span></span>
+<span><span class="co"># Mean Absolute Error (MAE) measures the average error in the predictions</span></span>
 <span><span class="fu"><a href="reference/reg-error.html">mae</a></span><span class="op">(</span><span class="va">actual_1</span>, <span class="va">predicted_1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.2</span></span>
 <span></span>
 <span><span class="co"># But how good is that? </span></span>
-<span><span class="co"># MAD gives the natural variation in the actual data; this is a point of comparison.</span></span>
+<span><span class="co"># Mean Absolute Deviation (MAD) gives the natural variation in the actual data around the mean; this is a point of comparison for the MAE.</span></span>
 <span><span class="fu"><a href="reference/reg-error.html">mad</a></span><span class="op">(</span><span class="va">actual_1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 1.736</span></span>
 <span></span>
 <span><span class="co"># So, our predictions are better (lower) than the MAD, but how good, really?</span></span>
 <span><span class="co"># Create a standardized accuracy function to give us an easily interpretable metric:</span></span>
 <span><span class="va">my_mae_vs_mad_sa</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/staccuracy.html">staccuracy</a></span><span class="op">(</span><span class="va">mae</span>, <span class="va">mad</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Now use it</span></span>
 <span><span class="fu">my_mae_vs_mad_sa</span><span class="op">(</span><span class="va">actual_1</span>, <span class="va">predicted_1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.9423963</span></span>
 <span></span>
