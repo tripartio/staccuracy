@@ -1,6 +1,6 @@
 Package: staccuracy
 Title: Standardized Accuracy and Other Model Performance Metrics
-Version: 0.1.0.20241006
+Version: 0.2.0
 Authors@R: 
     person("Chitu", "Okoli", , "Chitu.Okoli@skema.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-5574-7572"))
