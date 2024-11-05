@@ -1,4 +1,5 @@
-# utils.R
+# unpackaged_utils.R
+# Utility functions used across multiple packages yet not sufficiently universal to release as their own package.
 
 
 # Data validation --------------------
@@ -55,6 +56,15 @@ validate <- function(..., msg = NULL)
   }
 }
 
+# TRUE if all root elements of a list are character strings
+is_all_characters <- function(x) {
+  if (is.list(x)) {
+    all(purrr::map_lgl(x, is_all_characters))
+  } else {
+    is.character(x)
+  }
+}
+
 
 # TRUE if x is length 1 and is either a double or an integer
 is_scalar_number <- function(x) {
@@ -72,22 +82,51 @@ is_scalar_whole <- function(x) {
 }
 
 
-# Miscellaneous -----------------
+
+## Miscellaneous -----------------
+
+# Inverse of %in% operator
+`%notin%` <- Negate(`%in%`)
+
+# Concatenate two character vectors
+`%+%` <- function(cv1, cv2) {
+  paste0(cv1, cv2)
+}
+
+
+
+
+
+# Round a numeric vector to an intuitive number of decimal places:
+# ranging from 0 when abs(max(x)) > 100 to 3 when abs(max(x)) < 1
+round_dp <- function(x) {
+  validate(is.numeric(x))
+
+  max_x <- max(abs(x))
+  dp <- dplyr::case_when(
+    max_x > 100 ~ 0,
+    max_x >  10 ~ 1,
+    max_x >   1 ~ 2,
+    .default = 3
+  )
+
+  round(x, dp)
+}
+
 
 #' Determine the datatype of a vector
 #'
 #' @param var vector whose datatype is to be determined
 #'
-#' @returns Returns generic datatypes of R basic vectors according to the following mapping:
+#' Not exported. See @returns for details of what it does.
+#'
+#' @returns  Returns generic datatypes of R basic vectors according to the following mapping:
 #'  * `logical` returns 'binary'
 #'  * `numeric` values (e.g., `integer` and `double`) return 'numeric'
 #'  * However, if the only values of numeric are 0 and 1, then it returns 'binary'
 #'  * unordered `factor` returns 'categorical'
 #'  * `ordered` `factor` returns 'ordinal'
-#' @export
 #'
-#' @examples
-#' var_type(c(1, 2, 3))
 var_type <- function(var) {
 
   # If var has more than one class, use only the first (predominant) one.
