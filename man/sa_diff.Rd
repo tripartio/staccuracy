@@ -19,13 +19,13 @@ sa_diff(
 \arguments{
 \item{actual}{numeric vector. The actual (true) labels.}
 
-\item{preds}{named list of at least two numeric vectors. Each element is a vector of the same length as actual with predictions for each row corresponding to each element of actual. The names of the list elements will be used for the columns of the result.}
+\item{preds}{named list of at least two numeric vectors. Each element is a vector of the same length as actual with predictions for each row corresponding to each element of actual. The names of the list elements should be the names of the models that produced each respective prediction; these names will be used to distinguish the results.}
 
 \item{...}{not used. Forces explicit naming of subsequent arguments.}
 
 \item{na.rm}{See documentation for \code{\link[=staccuracy]{staccuracy()}}}
 
-\item{sa}{list of functions. Each element is the unquoted name of a staccuracy function. If an element is named, the name will be displayed as the value of the \code{sa} column of the result. Otherwise, the function name will be displayed. If NULL (default), staccuracy functions will be automatically selected based on the datatypes of actual and \code{preds}.}
+\item{sa}{list of functions. Each element is the unquoted name of a valid staccuracy function (see \code{\link[=staccuracy]{staccuracy()}} for the required function signature.) If an element is named, the name will be displayed as the value of the \code{sa} column of the result. Otherwise, the function name will be displayed. If NULL (default), staccuracy functions will be automatically selected based on the datatypes of actual and \code{preds}.}
 
 \item{pct}{numeric with values from (0, 1). The percentage values on which the difference in staccuracies will be tested.}
 
@@ -36,22 +36,31 @@ sa_diff(
 \item{seed}{integer(1). Random seed for the bootstrap sampling. Supply this between runs to assure identical results.}
 }
 \value{
-tibble. Columns are \code{sa} (name of staccuracy measure), then a column for each named element in \code{preds} (staccuracy for that prediction), then a column for each element of \code{pct} (p-value; percentage of iterations where the difference between staccuracy in the pair of \code{preds} is equal or greater than the \code{pct} value). E.g., for the default \code{pct = c(0.01, 0.02, 0.03, 0.04, 0.05)}, these columns would be \code{p_1}, \code{p_2}, \code{p_3}, \code{p_4}, and  \code{p_5}. When there are more than two predictions, then each row will compare only two at a time.
+tibble with staccuracy difference results:
+\itemize{
+\item \code{staccuracy}: name of staccuracy measure
+\item \code{pred}, \code{type}: When \code{type} is 'pred', the \code{pred} column gives named element in the input \code{preds}. The row values give the staccuracy for that prediction.  When \code{type} is 'diff', the \code{pred} column is of the form 'model1-model2', where 'model1' and 'model2' are names from the input \code{preds}, which should be the names of each model that provided the predictions. The row values give the difference between staccuracies of model1 and model2.
+\item \code{lo}, \code{mean}, \code{hi}: The lower bound, mean, and upper bound of the bootstrapped staccuracy. The lower and upper bounds are confidence intervals specified by the input \code{boot_alpha}.
+\item \code{p__}: p-values that the staccuracies are at least the specified percentage difference or greater.  E.g., for the default input \code{pct = c(0.01, 0.02, 0.03, 0.04, 0.05)}, these columns would be \code{p01}, \code{p02}, \code{p03}, \code{p04}, and  \code{p05}. As they apply only to differences between staccuracies, they are \code{NA} for rows of \code{type} 'pred'. As an example of their meaning, if the \code{mean} difference for 'model1-model2' is 0.0832 with \code{p01} of 0.012 and \code{p02} of 0.035, then it means that 1.2\% of bootstrapped staccuracies had a difference of model1 - model2 less than 0.01 and 3.5\% were less than 0.02. (That is, 98.8\% of differences were greater than 0.01 and 96.5\% were greater than 0.02.)
+}
 }
 \description{
-Because the distribution of staccuracies is uncertain (and indeed, different staccuracies likely have different distributions), bootstrapping is used to empirically estimate the distributions and calculate the p-values.
+Because the distribution of staccuracies is uncertain (and indeed, different staccuracies likely have different distributions), bootstrapping is used to empirically estimate the distributions and calculate the p-values. See the return value description for details on what the function provides.
 }
 \examples{
 lm_attitude_all <- lm(rating ~ ., data = attitude)
+lm_attitude__a <- lm(rating ~ . - advance, data = attitude)
 lm_attitude__c <- lm(rating ~ . - complaints, data = attitude)
 
-sa_diff(
+sdf <- sa_diff(
   attitude$rating,
   list(
     all = predict(lm_attitude_all),
-    madv = predict(lm_attitude__c)
+    madv = predict(lm_attitude__a),
+    mcmp = predict(lm_attitude__c)
   ),
   boot_it = 10
 )
+sdf
 
 }
