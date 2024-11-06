@@ -21,11 +21,17 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/tripartio/staccuracy/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tripartio/staccuracy/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-Standardized accuracy (staccuracy) is framework for expressing accuracy scores such that 50% represents a reference level of performance and 100% is a perfect prediction. The 'staccuracy' package provides tools for creating staccuracy functions as well as some recommended staccuracy measures. It also provides functions for some classic performance metrics such as mean absolute error (MAE), root mean squared error (RMSE), and area under the receiver operating characteristic curve (AUCROC), as well as their winsorized versions when applicable.
+Standardized accuracy (staccuracy) is a framework for expressing accuracy scores such that 50% represents a reference level of performance and 100% is a perfect prediction. The {staccuracy} package provides tools for creating staccuracy functions as well as some recommended staccuracy measures. It also provides functions for some classic performance metrics such as mean absolute error (MAE), root mean squared error (RMSE), and area under the receiver operating characteristic curve (AUCROC), as well as their winsorized versions when applicable.
 
 ## Installation
 
-You can install the development version of staccuracy like so:
+You can install the official CRAN version of {staccuracy}:
+
+``` r
+install.packages('staccuracy')
+```
+
+The development version of {staccuarcy} is thoroughly tested, but it might not be thoroughly documented. You can install it like so:
 
 ``` r
 # install.packages("pak")
@@ -34,7 +40,7 @@ pak::pak("tripartio/staccuracy")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+The basic challenge that {staccuarcy} addresses is not only to measure the accuracy of model predictions but to intuitively indicate how relevant the accuracy scores are:
 
 ```{r example}
 library(staccuracy)
