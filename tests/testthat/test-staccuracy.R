@@ -4,6 +4,7 @@
 
 test_that("sa_diff() works correctly", {
   lm_attitude_all <- lm(rating ~ ., data = attitude)
+  lm_attitude__a <- lm(rating ~ . - advance, data = attitude)
   lm_attitude__c <- lm(rating ~ . - complaints, data = attitude)
 
   expect_equal(
@@ -44,7 +45,8 @@ test_that("sa_diff() works correctly", {
       attitude$rating,
       list(
         all = predict(lm_attitude_all),
-        madv = predict(lm_attitude__c)
+        madv = predict(lm_attitude__a),
+        mcmp = predict(lm_attitude__c)
       ),
       boot_it = 10
     )

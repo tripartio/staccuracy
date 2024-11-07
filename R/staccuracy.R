@@ -120,9 +120,10 @@ sa_wrmse_sd <- staccuracy(win_rmse, stats::sd)
 #'
 #' @return tibble with staccuracy difference results:
 #' * `staccuracy`: name of staccuracy measure
-#' * `pred`, `type`: When `type` is 'pred', the `pred` column gives named element in the input `preds`. The row values give the staccuracy for that prediction.  When `type` is 'diff', the `pred` column is of the form 'model1-model2', where 'model1' and 'model2' are names from the input `preds`, which should be the names of each model that provided the predictions. The row values give the difference between staccuracies of model1 and model2.
+#' * `pred`: Each named element (model name) in the input `preds`. The row values give the staccuracy for that prediction. When `pred` is `NA`, the row represents the difference between prediction staccuracies (`diff`) instead of  staccuracies themselves.
+#' * `diff`: When `diff` takes the form 'model1-model2', then the row values give the difference in staccuracies between two named elements (model names) in the input `preds`. When `diff` is `NA`, the row instead represents the staccuracy of a specific model prediction (`pred`).
 #' * `lo`, `mean`, `hi`: The lower bound, mean, and upper bound of the bootstrapped staccuracy. The lower and upper bounds are confidence intervals specified by the input `boot_alpha`.
-#' * `p__`: p-values that the staccuracies are at least the specified percentage difference or greater.  E.g., for the default input `pct = c(0.01, 0.02, 0.03, 0.04, 0.05)`, these columns would be `p01`, `p02`, `p03`, `p04`, and  `p05`. As they apply only to differences between staccuracies, they are `NA` for rows of `type` 'pred'. As an example of their meaning, if the `mean` difference for 'model1-model2' is 0.0832 with `p01` of 0.012 and `p02` of 0.035, then it means that 1.2% of bootstrapped staccuracies had a difference of model1 - model2 less than 0.01 and 3.5% were less than 0.02. (That is, 98.8% of differences were greater than 0.01 and 96.5% were greater than 0.02.)
+#' * `p__`: p-values that the difference in staccuracies are at least the specified percentage amount or greater.  E.g., for the default input `pct = c(0.01, 0.02, 0.03, 0.04, 0.05)`, these columns would be `p01`, `p02`, `p03`, `p04`, and  `p05`. As they apply only to differences between staccuracies, they are provided only for `diff` rows and are `NA` for `pred` rows. As an example of their meaning, if the `mean` difference for 'model1-model2' is 0.0832 with `p01` of 0.012 and `p02` of 0.035, then 1.2% of bootstrapped staccuracies had a model1 - model2 difference of less than 0.01 and 3.5% were less than 0.02. (That is, 98.8% of differences were greater than 0.01 and 96.5% were greater than 0.02.)
 #'
 #' @export
 #'
@@ -247,10 +248,6 @@ sa_diff <- function(
   names_pct <- 'p' %+%
     stringr::str_pad(pct * 100, width = 2, pad = '0')
 
-  # Generate expressions for p-values each percent difference threshold
-  p_pct_exprs <- map(pct, ~ expr(sum(value < !!.x) / boot_it))
-  names(p_pct_exprs) <- names_pct
-
   # Summarize the bootstrapped staccuracies and differences
   sa_tbl <- sa_boot |>
     # Pivot long for easier summarization
@@ -263,18 +260,47 @@ sa_diff <- function(
       lo   = stats::quantile(.data$value, boot_alpha / 2),
       mean = mean(.data$value),
       hi   = stats::quantile(.data$value, 1 - (boot_alpha / 2)),
-      # Summarize p-values for requested percent thresholds
-      !!!p_pct_exprs,
-    ) |>
+      # Count the number of times the value is greater than or equal to the p threshold.
+      # Create as a list column with the integer vector of counts.
+      num_gte = purrr::map_int(pct, \(it.pct) {
+        sum(.data$value >= it.pct)
+      }) |>
+        set_names(names_pct) |>
+        list(),
+      # Count the number of times the value is less than or equal to the p threshold.
+      num_lte = purrr::map_int(pct, \(it.pct) {
+        sum(.data$value <= it.pct)
+      }) |>
+        set_names(names_pct) |>
+        list()
+    )
+
+  # Create diff column and distinguish from pred
+  sa_tbl <- sa_tbl |>
     mutate(
-      type = if_else(stringr::str_detect(.data$pred, '-'), 'diff', 'pred'),
-      # Delete p-value differences for actual staccuracies; they are irrelevant here
-      across(
-        all_of(names_pct),
-        ~ if_else(type == 'diff', .x, NA)
-      )
-    ) |>
-    select('staccuracy', 'pred', 'type', everything())
+      diff = if_else(stringr::str_detect(.data$pred, '-'), .data$pred, NA),
+      pred = if_else(is.na(.data$diff), .data$pred, NA)
+    )
+
+  # Add p-value columns.
+  # Iterate rows that express differences
+  for (i.r in which(!is.na(sa_tbl$diff))) {
+    # Iterate requested p-value thresholds
+    for (it.pct in names_pct) {
+      sa_tbl[[i.r, it.pct]] <-
+        # Count greater-than counts or less-than counts depending on if the mean difference is positive or negative
+        if (sa_tbl[i.r, 'mean'] >= 0) {
+          # p = (r+1)/(n+1): https://europepmc.org/article/MED/12111669
+          (sa_tbl[[i.r, 'num_lte']][[1]][[it.pct]] + 1) / (boot_it + 1)
+        } else {
+          (sa_tbl[[i.r, 'num_gte']][[1]][[it.pct]] + 1) / (boot_it + 1)
+        }
+      }
+    }
+
+  sa_tbl <- sa_tbl |>
+    select('staccuracy', 'pred', 'diff', everything()) |>
+    select(-'num_gte', -'num_lte')
 
 
   return(sa_tbl)
