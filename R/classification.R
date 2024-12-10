@@ -5,10 +5,10 @@
 #' @export
 #' @rdname class-error
 #'
-#' @param actual any atomic vector. Actual label values from a dataset. They must be binary; that is, there must be exactly two distinct values (other than missing values, which are allowed). The "true" or "positive" class is determined by coercing `actual` to logical `TRUE` and `FALSE` following the rules of [as.logical()]. If this is not the intended meaning of "positive", then specify which of the two values should be considered `TRUE` with the argument `binary_true_value`.
+#' @param actual any atomic vector. Actual label values from a dataset. They must be binary; that is, there must be exactly two distinct values (other than missing values, which are allowed). The "true" or "positive" class is determined by coercing `actual` to logical `TRUE` and `FALSE` following the rules of [as.logical()]. If this is not the intended meaning of "positive", then specify which of the two values should be considered `TRUE` with the argument `positive`.
 #' @param pred numeric vector. Predictions corresponding to each respective element in `actual`. Any numeric value (not only probabilities) are permissible.
 #' @param na.rm logical(1). `TRUE` if missing values should be removed; `FALSE` if they should be retained. If `TRUE`, then if any element of either `actual` or `pred` is missing, its paired element will be also removed.
-#' @param binary_true_value any single atomic value. The value of `actual` that is considered `TRUE`; any other value of `actual` is considered `FALSE`. For example, if `2` means `TRUE` and `1` means `FALSE`, then set `binary_true_value = 2`.
+#' @param positive any single atomic value. The value of `actual` that is considered `TRUE`; any other value of `actual` is considered `FALSE`. For example, if `2` means `TRUE` and `1` means `FALSE`, then set `positive = 2`.
 #' @param sample_size single positive integer. To keep the computation relatively rapid, when `actual` and `pred` are longer than `sample_size` elements, then a random sample of `sample_size` of `actual` and `pred` will be selected and the ROC and AUC will be calculated on this sample. To disable random sampling for long inputs, set `sample_size = NA`.
 #' @param seed numeric(1). Random seed used only if `length(actual) > sample_size`.
 #'
@@ -37,13 +37,13 @@ aucroc <- function(
     actual,
     pred,
     na.rm = FALSE,
-    binary_true_value = NULL,
+    positive = NULL,
     sample_size = 10000,
     seed = 0
   )
 {
   # Validate inputs
-  validate(is.null(binary_true_value) || rlang::is_scalar_atomic(binary_true_value))
+  validate(is.null(positive) || rlang::is_scalar_atomic(positive))
   validate(is.vector(actual))
   # pred can be any number, not only a probability
   validate(is.numeric(pred))
@@ -54,9 +54,9 @@ aucroc <- function(
   validate(is_scalar_natural(sample_size))
   validate(is.numeric(seed))
 
-  if (!is.null(binary_true_value)) {
-    # If binary_true_value is provided, then it overrides any other values of actual
-    actual <- actual == binary_true_value
+  if (!is.null(positive)) {
+    # If positive is provided, then it overrides any other values of actual
+    actual <- actual == positive
   }
   else {
     # Coerce actual to binary using the standard as.logical() rules
