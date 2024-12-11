@@ -212,31 +212,46 @@ aucroc <- function(
 #' @param quants scalar positive integer. If `cuts` is `NULL` (default), `actual` will be dichotomized into `quants` quantiles and that many ROCs will be returned in the `rocs` element. However, if `cuts` is specified, then `quants` is ignored.
 #' @param ... Not used. Forces explicit naming of the arguments that follow.
 #' @param cuts numeric vector. If `cuts` is provided, it overrides `quants` to specify the cut points for dichotomization of `actual` for the creation of `cuts + 1` ROCs.
+#' @param imbalance numeric(1) in (0, 0.5]. The result element `mean_auc` averages the AUCs over three regions (see details of the return value). `imbalance` is the supposed percentage of the less frequent class in the data. If not provided, defaults to 0.05 (5%).
 #' @param na.rm See documentation for `aucroc()`
 #' @param sample_size See documentation for `aucroc()`. In addition to those notes, for `reg_aucroc()`, any sampling is conducted before the dichotomization of `actual` so that all classification ROCs are based on identical data.
 #' @param seed See documentation for `aucroc()`
 #'
 #' @returns List with the following elements:
 #' * `rocs`: List of results for `aucroc()` for each dichotomized segment of `actual`.
-#'
-#'
-#' * `roc_opt`: tibble with optimistic ROC data. "Optimistic" means that when predictions are tied, the TRUE/positive actual values are ordered before the FALSE/negative ones.
-#' * `roc_pess`: tibble with pessimistic ROC data. "Pessimistic" means that when predictions are tied, the FALSE/negative actual values are ordered before the TRUE/positive ones. Note that this difference is not merely in the sort order: when there are ties, the way that true positives, true negatives, etc. are counted is different for optimistic and pessimistic approaches. If there are no tied predictions, then `roc_opt` and `roc_pess` are identical.
-#' * `auc_opt`: area under the ROC curve for optimistic ROC.
-#' * `auc_pess`: area under the ROC curve for pessimistic ROC.
-#' * `auc`: mean of `auc_opt` and `auc_pess`. If there are no tied predictions, then `auc_opt`, `auc_pess`, and `auc` are identical.
-#' * `ties`: `TRUE` if there are two or more tied predictions; `FALSE` if there are no ties.
+#' * `auc`: named numeric vector of AUC extracted from each element of `rocs`. Named by the percentile that the AUC represents.
+#' * `mean_auc`: named numeric(3). The average AUC over the low, middle, and high quantiles of dichotomization:
+#' * `lo`: average AUC with `imbalance`% (e.g., 5%) or less of the actual target values;
+#' * `mid`: average AUC in between `lo` and `hi`;
+#' * `hi`: average AUC with (1 - `imbalance`)% (e.g., 95%) or more of the actual target values;
 #'
 #' @examples
-#' set.seed(0)
-#' # Generate some simulated "actual" data
-#' a <- runif(50, 0, 100)
+#' # Remove rows with missing values from airquality dataset
+#' airq <- airquality |>
+#'   as_tibble() |>
+#'   na.omit()
 #'
-#' # Generate some simulated predictions
-#' p <- (a * rnorm(50, 1, 0.5)) + rnorm(50, 0, 0.5)
+#' # Create binary version where the target variable 'Ozone' is dichotomized based on its median
+#' airq_bin <- airq |>
+#'   mutate(Ozone = Ozone >= median(Ozone))
 #'
-#' # Calculate regression AUCROC with its components
-#' rr <- reg_aucroc(a, p)
+#' # Create a generic regression model; use autogam
+#' req_aq   <- autogam::autogam(airq, 'Ozone')
+#' req_aq$perf$sa_wmae_mad  # Standardized accuracy for regression
+#'
+#' # Create a generic classification model; use autogam
+#' class_aq <- autogam::autogam(airq_bin, 'Ozone')
+#' class_aq$perf$auc  # AUC (standardized accuracy for classification)
+#'
+#' # Compute AUC for regression predictions
+#' reg_auc_aq <- reg_aucroc(
+#'   airq$Ozone,
+#'   predict(req_aq)
+#' )
+#'
+#' # Average AUC over the lo, mid, and hi quantiles of dichotomization:
+#' reg_auc_aq$mean_auc
+#'
 #'
 reg_aucroc <- function(
     actual,
@@ -250,7 +265,13 @@ reg_aucroc <- function(
     seed = 0
 )
 {
+  # Validate inputs
+  validate(is.numeric(actual))
+  validate(is.numeric(pred))
+
   len <- length(actual)
+  validate(len == length(pred))
+
 
   # If len < quants, adjust number of quants to len - 1
   num_quants <- min(num_quants, len + 1)
@@ -261,7 +282,7 @@ reg_aucroc <- function(
       scale(min(actual), max(actual) - min(actual))
     )
 
-  res <- quants[-c(1, num_quants)] |>  # skip the first and last elements
+  rocs <- quants[-c(1, num_quants)] |>  # skip the first and last elements
     map(\(it.quant) {
       aucroc(
         actual >= it.quant,
@@ -270,7 +291,7 @@ reg_aucroc <- function(
       )
     })
 
-  auc <- res |>
+  auc <- rocs |>
     purrr::map_dbl(\(it.roc) it.roc$auc)
   auc_quants <- names(auc) |>
     stringr::str_sub(end = -2) |>
@@ -286,8 +307,9 @@ reg_aucroc <- function(
   )
 
   return(list(
-    rocs = res,
+    rocs = rocs,
     auc = auc,
+    quants = auc_quants,
     mean_auc = mean_auc
   ))
 
