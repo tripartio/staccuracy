@@ -1,6 +1,9 @@
-# staccuracy (development version)
+# staccuracy 0.2.2
 
--   Corrected bug in p-value calculation. Rewrote `sa_diff()` output to separate staccuracies from their differences. Use the `(r+1)/(n+1)` p-value calculation from [North et al. (2003)](https://pmc.ncbi.nlm.nih.gov/articles/PMC379244/).
+-   Add `reg_aucroc()` function to calculate AUC for regression models.
+-   Corrected bug in p-value calculation. 
+-   Rewrote `sa_diff()` output to separate staccuracies from their differences. 
+l-  Use the `(r+1)/(n+1)` p-value calculation from [North et al. (2003)](https://pmc.ncbi.nlm.nih.gov/articles/PMC379244/).
 
 # staccuracy 0.2.0
 

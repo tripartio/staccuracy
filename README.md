@@ -14,7 +14,7 @@ status](https://www.r-pkg.org/badges/version/staccuracy)](https://CRAN.R-project
 
 Standardized accuracy (staccuracy) is a framework for expressing
 accuracy scores such that 50% represents a reference level of
-performance and 100% is a perfect prediction. The {staccuracy} package
+performance and 100% is a perfect prediction. The `{staccuracy}` package
 provides tools for creating staccuracy functions as well as some
 recommended staccuracy measures. It also provides functions for some
 classic performance metrics such as mean absolute error (MAE), root mean
@@ -24,13 +24,13 @@ applicable.
 
 ## Installation
 
-You can install the official CRAN version of {staccuracy}:
+You can install the official CRAN version of `{staccuracy}`:
 
 ``` r
 install.packages('staccuracy')
 ```
 
-The development version of {staccuarcy} is thoroughly tested, but it
+The development version of `{staccuracy}` is thoroughly tested, but it
 might not be thoroughly documented. You can install it like so:
 
 ``` r
@@ -40,7 +40,7 @@ pak::pak("tripartio/staccuracy")
 
 ## Example
 
-The basic challenge that {staccuarcy} addresses is not only to measure
+The basic challenge that `{staccuracy}` addresses is not only to measure
 the accuracy of model predictions but to intuitively indicate how
 relevant the accuracy scores are:
 

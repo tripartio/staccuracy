@@ -209,7 +209,7 @@ aucroc <- function(
 #'
 #' @param actual numeric vector. Actual label values from a dataset. They must be numeric.
 #' @param pred numeric vector. Predictions corresponding to each respective element in `actual`.
-#' @param quants scalar positive integer. If `cuts` is `NULL` (default), `actual` will be dichotomized into `quants` quantiles and that many ROCs will be returned in the `rocs` element. However, if `cuts` is specified, then `quants` is ignored.
+#' @param num_quants scalar positive integer. If `cuts` is `NULL` (default), `actual` will be dichotomized into `quants` quantiles and that many ROCs will be returned in the `rocs` element. However, if `cuts` is specified, then `quants` is ignored.
 #' @param ... Not used. Forces explicit naming of the arguments that follow.
 #' @param cuts numeric vector. If `cuts` is provided, it overrides `quants` to specify the cut points for dichotomization of `actual` for the creation of `cuts + 1` ROCs.
 #' @param imbalance numeric(1) in (0, 0.5]. The result element `mean_auc` averages the AUCs over three regions (see details of the return value). `imbalance` is the supposed percentage of the less frequent class in the data. If not provided, defaults to 0.05 (5%).
@@ -228,19 +228,18 @@ aucroc <- function(
 #' @examples
 #' # Remove rows with missing values from airquality dataset
 #' airq <- airquality |>
-#'   as_tibble() |>
 #'   na.omit()
 #'
 #' # Create binary version where the target variable 'Ozone' is dichotomized based on its median
-#' airq_bin <- airq |>
-#'   mutate(Ozone = Ozone >= median(Ozone))
+#' airq_bin <- airq
+#' airq_bin$Ozone <- airq_bin$Ozone >= median(airq_bin$Ozone)
 #'
 #' # Create a generic regression model; use autogam
-#' req_aq   <- autogam::autogam(airq, 'Ozone')
+#' req_aq   <- autogam::autogam(airq, 'Ozone', family = gaussian())
 #' req_aq$perf$sa_wmae_mad  # Standardized accuracy for regression
 #'
 #' # Create a generic classification model; use autogam
-#' class_aq <- autogam::autogam(airq_bin, 'Ozone')
+#' class_aq <- autogam::autogam(airq_bin, 'Ozone', family = binomial())
 #' class_aq$perf$auc  # AUC (standardized accuracy for classification)
 #'
 #' # Compute AUC for regression predictions

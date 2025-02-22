@@ -8,19 +8,19 @@ aucroc(
   actual,
   pred,
   na.rm = FALSE,
-  binary_true_value = NULL,
+  positive = NULL,
   sample_size = 10000,
   seed = 0
 )
 }
 \arguments{
-\item{actual}{any atomic vector. Actual label values from a dataset. They must be binary; that is, there must be exactly two distinct values (other than missing values, which are allowed). The "true" or "positive" class is determined by coercing \code{actual} to logical \code{TRUE} and \code{FALSE} following the rules of \code{\link[=as.logical]{as.logical()}}. If this is not the intended meaning of "positive", then specify which of the two values should be considered \code{TRUE} with the argument \code{binary_true_value}.}
+\item{actual}{any atomic vector. Actual label values from a dataset. They must be binary; that is, there must be exactly two distinct values (other than missing values, which are allowed). The "true" or "positive" class is determined by coercing \code{actual} to logical \code{TRUE} and \code{FALSE} following the rules of \code{\link[=as.logical]{as.logical()}}. If this is not the intended meaning of "positive", then specify which of the two values should be considered \code{TRUE} with the argument \code{positive}.}
 
 \item{pred}{numeric vector. Predictions corresponding to each respective element in \code{actual}. Any numeric value (not only probabilities) are permissible.}
 
 \item{na.rm}{logical(1). \code{TRUE} if missing values should be removed; \code{FALSE} if they should be retained. If \code{TRUE}, then if any element of either \code{actual} or \code{pred} is missing, its paired element will be also removed.}
 
-\item{binary_true_value}{any single atomic value. The value of \code{actual} that is considered \code{TRUE}; any other value of \code{actual} is considered \code{FALSE}. For example, if \code{2} means \code{TRUE} and \code{1} means \code{FALSE}, then set \code{binary_true_value = 2}.}
+\item{positive}{any single atomic value. The value of \code{actual} that is considered \code{TRUE}; any other value of \code{actual} is considered \code{FALSE}. For example, if \code{2} means \code{TRUE} and \code{1} means \code{FALSE}, then set \code{positive = 2}.}
 
 \item{sample_size}{single positive integer. To keep the computation relatively rapid, when \code{actual} and \code{pred} are longer than \code{sample_size} elements, then a random sample of \code{sample_size} of \code{actual} and \code{pred} will be selected and the ROC and AUC will be calculated on this sample. To disable random sampling for long inputs, set \code{sample_size = NA}.}
 

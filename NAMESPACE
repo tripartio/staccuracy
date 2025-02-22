@@ -3,6 +3,7 @@
 export(aucroc)
 export(mad)
 export(mae)
+export(reg_aucroc)
 export(rmse)
 export(sa_diff)
 export(sa_mae_mad)
