@@ -20,5 +20,7 @@ Imports:
     rlang,
     stringr,
     tidyr
+Depends: 
+    R (>= 4.2.0)
 URL: https://github.com/tripartio/staccuracy, https://tripartio.github.io/staccuracy/
 BugReports: https://github.com/tripartio/staccuracy/issues
