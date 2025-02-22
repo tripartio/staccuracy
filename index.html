@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">staccuracy</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.20241107</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,14 +51,14 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>Standardized accuracy (staccuracy) is a framework for expressing accuracy scores such that 50% represents a reference level of performance and 100% is a perfect prediction. The {staccuracy} package provides tools for creating staccuracy functions as well as some recommended staccuracy measures. It also provides functions for some classic performance metrics such as mean absolute error (MAE), root mean squared error (RMSE), and area under the receiver operating characteristic curve (AUCROC), as well as their winsorized versions when applicable.</p>
+<p>Standardized accuracy (staccuracy) is a framework for expressing accuracy scores such that 50% represents a reference level of performance and 100% is a perfect prediction. The <a href="https://github.com/tripartio/staccuracy" class="external-link">staccuracy</a> package provides tools for creating staccuracy functions as well as some recommended staccuracy measures. It also provides functions for some classic performance metrics such as mean absolute error (MAE), root mean squared error (RMSE), and area under the receiver operating characteristic curve (AUCROC), as well as their winsorized versions when applicable.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the official CRAN version of {staccuracy}:</p>
+<p>You can install the official CRAN version of <a href="https://github.com/tripartio/staccuracy" class="external-link">staccuracy</a>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'staccuracy'</span><span class="op">)</span></span></code></pre></div>
-<p>The development version of {staccuarcy} is thoroughly tested, but it might not be thoroughly documented. You can install it like so:</p>
+<p>The development version of <a href="https://github.com/tripartio/staccuracy" class="external-link">staccuracy</a> is thoroughly tested, but it might not be thoroughly documented. You can install it like so:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"tripartio/staccuracy"</span><span class="op">)</span></span></code></pre></div>
@@ -66,7 +66,7 @@
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
-<p>The basic challenge that {staccuarcy} addresses is not only to measure the accuracy of model predictions but to intuitively indicate how relevant the accuracy scores are:</p>
+<p>The basic challenge that <a href="https://github.com/tripartio/staccuracy" class="external-link">staccuracy</a> addresses is not only to measure the accuracy of model predictions but to intuitively indicate how relevant the accuracy scores are:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tripartio/staccuracy" class="external-link">staccuracy</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
