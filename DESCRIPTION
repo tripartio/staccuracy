@@ -17,6 +17,7 @@ Suggests:
 Imports: 
     cli,
     dplyr,
+    methods,
     purrr,
     rlang,
     stringr,
